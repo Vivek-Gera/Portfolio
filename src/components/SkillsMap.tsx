@@ -8,174 +8,74 @@ interface SkillNode {
   x: number;
   y: number;
   description: string;
-  projects: string[];
 }
+
+const skills: SkillNode[] = [
+  { id: 'cloud', name: 'Cloud', category: 'Cloud', x: 50, y: 10, description: 'AWS, Google Cloud, Microsoft Azure' },
+  { id: 'backend-programming', name: 'Backend Programming', category: 'Backend', x: 18, y: 20, description: 'Python, Java, C' },
+  { id: 'data-streaming', name: 'Data Streaming', category: 'Data Streaming', x: 80, y: 20, description: 'Apache Kafka, Real-time streaming' },
+
+  { id: 'data-analysis', name: 'Data Analysis', category: 'Analytics', x: 40, y: 35, description: 'Power BI, Tableau, Data Visualization, SQL' },
+  { id: 'database-languages', name: 'Database Languages', category: 'Database', x: 25, y: 40, description: 'HQL, SQL (Oracle), NoSQL (MongoDB, Postgres)' },
+  { id: 'cache', name: 'Cache', category: 'Cache', x: 70, y: 40, description: 'Redis, In-memory caching' },
+
+  { id: 'data-scientist', name: 'Data Scientist', category: 'ML/AI', x: 55, y: 50, description: 'Deep Learning, CNN, Machine Learning, Statistical Analysis' },
+
+  { id: 'data-engineering', name: 'Data Engineering', category: 'ETL & Pipeline', x: 20, y: 65, description: 'Kafka, Airflow, Kubernetes, Docker, Spark, Redis, PostgreSQL, Java, AWS' },
+  { id: 'workflow', name: 'Workflow', category: 'Workflow', x: 40, y: 70, description: 'Apache Airflow, DAG management' },
+  { id: 'big-data', name: 'Big Data', category: 'Big Data', x: 65, y: 65, description: 'Apache Spark, Distributed computing' },
+
+  { id: 'devops', name: 'DevOps', category: 'DevOps', x: 80, y: 80, description: 'Docker, Microservices deployment' }
+];
+
+
+const connections = [
+  { from: 'data-analysis', to: 'backend-programming' },
+  { from: 'data-analysis', to: 'cloud' },
+  { from: 'data-analysis', to: 'data-streaming' },
+  { from: 'data-analysis', to: 'data-scientist' },
+  { from: 'data-analysis', to: 'workflow' },
+  { from: 'data-analysis', to: 'database-languages' },
+  { from: 'data-scientist', to: 'big-data' },
+  { from: 'data-scientist', to: 'data-streaming' },
+  { from: 'data-scientist', to: 'cache' },
+  { from: 'data-scientist', to: 'devops' },
+  { from: 'backend-programming', to: 'database-languages' },
+  { from: 'backend-programming', to: 'cloud' },
+  { from: 'backend-programming', to: 'data-streaming' },
+  { from: 'database-languages', to: 'data-engineering' },
+  { from: 'data-engineering', to: 'workflow' },
+  { from: 'data-engineering', to: 'devops' },
+  { from: 'workflow', to: 'big-data' },
+  { from: 'cloud', to: 'data-streaming' },
+  { from: 'data-streaming', to: 'cache' },
+  { from: 'cache', to: 'big-data' },
+  { from: 'big-data', to: 'devops' }
+];
+
+const getSkillColor = (category: string) => {
+  const colors = {
+    'Analytics': 'from-gray-400 to-gray-500',
+    'ML/AI': 'from-gray-400 to-gray-500',
+    'Backend': 'from-data-blue to-api-purple',
+    'Data Streaming': 'from-pipeline-orange to-terminal-green',
+    'Big Data': 'from-api-purple to-data-blue',
+    'Workflow': 'from-terminal-green to-pipeline-orange',
+    'Database': 'from-data-blue to-terminal-green',
+    'Cache': 'from-pipeline-orange to-api-purple',
+    'DevOps': 'from-terminal-green to-data-blue',
+    'Orchestration': 'from-api-purple to-pipeline-orange',
+    'Cloud': 'from-data-blue to-terminal-green',
+    'Scripting': 'from-pipeline-orange to-api-purple'
+  };
+  return colors[category as keyof typeof colors] || 'from-gray-500 to-gray-600';
+};
+
+const NODE_RADIUS = 55; // Increased radius for larger circles
 
 const SkillsMap: React.FC = () => {
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
-
-  const skills: SkillNode[] = [
-    {
-      id: 'data-analytics',
-      name: 'Data Analytics',
-      category: 'Analytics',
-      x: 35,
-      y: 35,
-      description: 'SQL, Power BI, Tableau, Data Visualization',
-      projects: ['Business Intelligence', 'Dashboard Development']
-    },
-    {
-      id: 'data-science',
-      name: 'Data Science',
-      category: 'ML/AI',
-      x: 65,
-      y: 55,
-      description: 'Machine Learning, Statistical Analysis, Model Building',
-      projects: ['Predictive Models', 'NLP Applications']
-    },
-    {
-      id: 'java',
-      name: 'Java',
-      category: 'Backend',
-      x: 15,
-      y: 25,
-      description: 'Core Java, Spring Boot, Microservices',
-      projects: ['E-commerce Platform', 'Payment Gateway']
-    },
-    {
-      id: 'postgresql',
-      name: 'PostgreSQL',
-      category: 'Database',
-      x: 25,
-      y: 50,
-      description: 'Relational database, Data modeling',
-      projects: ['Data Warehouse', 'OLTP Systems']
-    },
-    {
-      id: 'kubernetes',
-      name: 'Kubernetes',
-      category: 'Orchestration',
-      x: 10,
-      y: 75,
-      description: 'Container orchestration, Scalability',
-      projects: ['Microservices Platform', 'Auto-scaling']
-    },
-    {
-      id: 'airflow',
-      name: 'Apache Airflow',
-      category: 'Workflow',
-      x: 25,
-      y: 85,
-      description: 'Workflow orchestration, DAG management',
-      projects: ['Data Pipeline Orchestration', 'Scheduled Jobs']
-    },
-    {
-      id: 'aws',
-      name: 'AWS',
-      category: 'Cloud',
-      x: 50,
-      y: 15,
-      description: 'Cloud infrastructure, Serverless',
-      projects: ['Cloud Migration', 'Serverless APIs']
-    },
-    {
-      id: 'kafka',
-      name: 'Apache Kafka',
-      category: 'Data Streaming',
-      x: 85,
-      y: 25,
-      description: 'Real-time data streaming, Event-driven architecture',
-      projects: ['Real-time Analytics', 'Log Processing Pipeline']
-    },
-    {
-      id: 'redis',
-      name: 'Redis',
-      category: 'Cache',
-      x: 75,
-      y: 45,
-      description: 'In-memory caching, Session management',
-      projects: ['API Caching', 'Session Store']
-    },
-    {
-      id: 'spark',
-      name: 'Apache Spark',
-      category: 'Big Data',
-      x: 85,
-      y: 75,
-      description: 'Distributed computing, Data processing',
-      projects: ['ETL Pipeline', 'Machine Learning Pipeline']
-    },
-    {
-      id: 'docker',
-      name: 'Docker',
-      category: 'DevOps',
-      x: 90,
-      y: 85,
-      description: 'Containerization, Microservices deployment',
-      projects: ['Containerized Services', 'CI/CD Pipeline']
-    }
-  ];
-
-  const connections = [
-    // Data Analytics connections (central hub)
-    { from: 'data-analytics', to: 'java' },
-    { from: 'data-analytics', to: 'aws' },
-    { from: 'data-analytics', to: 'kafka' },
-    { from: 'data-analytics', to: 'data-science' },
-    { from: 'data-analytics', to: 'airflow' },
-    { from: 'data-analytics', to: 'postgresql' },
-    
-    // Data Science connections
-    { from: 'data-science', to: 'spark' },
-    { from: 'data-science', to: 'kafka' },
-    { from: 'data-science', to: 'redis' },
-    { from: 'data-science', to: 'docker' },
-    
-    // Java connections
-    { from: 'java', to: 'postgresql' },
-    { from: 'java', to: 'aws' },
-    { from: 'java', to: 'kafka' },
-    
-    // PostgreSQL connections
-    { from: 'postgresql', to: 'kubernetes' },
-    
-    // Kubernetes connections
-    { from: 'kubernetes', to: 'airflow' },
-    { from: 'kubernetes', to: 'docker' },
-    
-    // Apache Airflow connections
-    { from: 'airflow', to: 'spark' },
-    
-    // AWS connections
-    { from: 'aws', to: 'kafka' },
-    
-    // Apache Kafka connections
-    { from: 'kafka', to: 'redis' },
-    
-    // Redis connections
-    { from: 'redis', to: 'spark' },
-    
-    // Apache Spark connections
-    { from: 'spark', to: 'docker' }
-  ];
-
-  const getSkillColor = (category: string) => {
-    const colors = {
-      'Analytics': 'from-gray-400 to-gray-500',
-      'ML/AI': 'from-gray-400 to-gray-500',
-      'Backend': 'from-data-blue to-api-purple',
-      'Data Streaming': 'from-pipeline-orange to-terminal-green',
-      'Big Data': 'from-api-purple to-data-blue',
-      'Workflow': 'from-terminal-green to-pipeline-orange',
-      'Database': 'from-data-blue to-terminal-green',
-      'Cache': 'from-pipeline-orange to-api-purple',
-      'DevOps': 'from-terminal-green to-data-blue',
-      'Orchestration': 'from-api-purple to-pipeline-orange',
-      'Cloud': 'from-data-blue to-terminal-green',
-      'Scripting': 'from-pipeline-orange to-api-purple'
-    };
-    return colors[category as keyof typeof colors] || 'from-gray-500 to-gray-600';
-  };
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
 
   return (
     <section id="skills" className="py-20 bg-dark-bg">
@@ -198,7 +98,7 @@ const SkillsMap: React.FC = () => {
         {/* Circuit Board Container */}
         <div className="relative w-full h-[600px] bg-card-bg border border-border-gray rounded-lg overflow-hidden">
           {/* Grid Pattern */}
-          <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 opacity-10 pointer-events-none">
             <svg width="100%" height="100%">
               <defs>
                 <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -209,21 +109,28 @@ const SkillsMap: React.FC = () => {
             </svg>
           </div>
 
-          {/* Connections */}
-          <svg className="absolute inset-0 w-full h-full">
+          {/* SVG for lines and nodes */}
+          <svg className="absolute inset-0 w-full h-full" width="100%" height="100%"
+            viewBox="0 0 1200 720" // Increased viewBox for larger layout
+            style={{ display: 'block', zIndex: 10 }}
+          >
+            {/* Connections */}
             {connections.map((connection, index) => {
               const fromSkill = skills.find(s => s.id === connection.from);
               const toSkill = skills.find(s => s.id === connection.to);
-              
               if (!fromSkill || !toSkill) return null;
-
+              // Convert percent to SVG coordinates (scale up for new viewBox)
+              const x1 = fromSkill.x * 12;
+              const y1 = fromSkill.y * 7.2;
+              const x2 = toSkill.x * 12;
+              const y2 = toSkill.y * 7.2;
               return (
                 <motion.line
                   key={index}
-                  x1={`${fromSkill.x}%`}
-                  y1={`${fromSkill.y}%`}
-                  x2={`${toSkill.x}%`}
-                  y2={`${toSkill.y}%`}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
                   stroke="#00ff41"
                   strokeWidth="2"
                   opacity="0.3"
@@ -233,51 +140,121 @@ const SkillsMap: React.FC = () => {
                 />
               );
             })}
+
+            {/* Skill Nodes */}
+            {skills.map((skill, index) => {
+              const cx = skill.x * 12;
+              const cy = skill.y * 7.2;
+              const gradientId = `gradient-${skill.category.replace(/\s/g, '-')}`;
+              return (
+                <g key={skill.id}
+                  onMouseEnter={e => {
+                    setHoveredSkill(skill.id);
+                    // Get SVG position and map to screen
+                    const svg = e.currentTarget.ownerSVGElement;
+                    if (svg) {
+                      const pt = svg.createSVGPoint();
+                      pt.x = cx;
+                      pt.y = cy - NODE_RADIUS - 10; // above the node
+                      const screenCTM = svg.getScreenCTM();
+                      if (screenCTM) {
+                        const transformed = pt.matrixTransform(screenCTM);
+                        setTooltipPos({ x: transformed.x, y: transformed.y });
+                      }
+                    }
+                  }}
+                  onMouseLeave={() => { setHoveredSkill(null); setTooltipPos(null); }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={NODE_RADIUS}
+                    fill={`url(#${gradientId})`}
+                    stroke="#00ff41"
+                    strokeWidth="2"
+                    filter={hoveredSkill === skill.id ? 'drop-shadow(0 0 12px #00ff41)' : undefined}
+                  />
+                  <text
+                    x={cx}
+                    y={cy}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize="16"
+                    fontWeight="bold"
+                    fill="#fff"
+                    pointerEvents="none"
+                    style={{ fontFamily: 'monospace', userSelect: 'none' }}
+                  >
+                    {skill.name.split(' ').map((word, i, arr) => (
+                      <tspan
+                        key={i}
+                        x={cx}
+                        dy={i === 0 ? 0 : 18}
+                        textAnchor="middle"
+                      >
+                        {word}
+                      </tspan>
+                    ))}
+                  </text>
+                </g>
+              );
+            })}
+
+            {/* SVG Gradients for categories */}
+            <defs>
+              {Array.from(new Set(skills.map(s => s.category))).map((category, i) => {
+                // Map tailwind-like color names to real colors
+                const colorMap: Record<string, [string, string]> = {
+                  'Analytics': ['#bdbdbd', '#757575'],
+                  'ML/AI': ['#bdbdbd', '#757575'],
+                  'Backend': ['#3b82f6', '#a21caf'],
+                  'Data Streaming': ['#f59e42', '#22c55e'],
+                  'Big Data': ['#a21caf', '#3b82f6'],
+                  'Workflow': ['#22c55e', '#f59e42'],
+                  'Database': ['#3b82f6', '#22c55e'],
+                  'Cache': ['#f59e42', '#a21caf'],
+                  'DevOps': ['#22c55e', '#3b82f6'],
+                  'Orchestration': ['#a21caf', '#f59e42'],
+                  'Cloud': ['#3b82f6', '#22c55e'],
+                  'Scripting': ['#f59e42', '#a21caf'],
+                };
+                const [from, to] = colorMap[category] || ['#757575', '#bdbdbd'];
+                return (
+                  <linearGradient id={`gradient-${category.replace(/\s/g, '-')}`} key={category} x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor={from} />
+                    <stop offset="100%" stopColor={to} />
+                  </linearGradient>
+                );
+              })}
+            </defs>
           </svg>
 
-          {/* Skill Nodes */}
-          {skills.map((skill, index) => (
-            <motion.div
-              key={skill.id}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2"
-              style={{ 
-                left: `${skill.x}%`, 
-                top: `${skill.y}%` 
-              } as React.CSSProperties}
-              initial={{ opacity: 0, scale: 0 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ scale: 1.1 }}
+          {/* Tooltip (floating, above all) */}
+          {hoveredSkill && tooltipPos && (
+            <div
+              style={{
+                position: 'fixed',
+                left: tooltipPos.x,
+                top: tooltipPos.y - 10,
+                zIndex: 50,
+                minWidth: 220,
+                maxWidth: 320,
+                background: '#181d23',
+                border: '1.5px solid #00ff41',
+                borderRadius: 12,
+                padding: '18px 22px',
+                color: '#fff',
+                fontFamily: 'monospace',
+                boxShadow: '0 2px 16px #000a',
+                pointerEvents: 'none',
+                transform: 'translate(-50%, -100%)'
+              }}
             >
-              <motion.div
-                className={`w-20 h-20 rounded-full bg-gradient-to-br ${getSkillColor(skill.category)} flex items-center justify-center cursor-pointer glow-effect`}
-                onHoverStart={() => setHoveredSkill(skill.id)}
-                onHoverEnd={() => setHoveredSkill(null)}
-                whileHover={{ scale: 1.1 }}
-              >
-                <span className="text-white font-bold text-xs text-center leading-tight px-1">{skill.name}</span>
-              </motion.div>
-
-              {/* Tooltip */}
-              {hoveredSkill === skill.id && (
-                <motion.div
-                  className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 w-64 bg-card-bg border border-border-gray rounded-lg p-4 z-10"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                >
-                  <h3 className="font-bold text-terminal-green mb-2">{skill.name}</h3>
-                  <p className="text-sm text-gray-300 mb-3">{skill.description}</p>
-                  <div className="space-y-1">
-                    <p className="text-xs text-gray-400">Projects:</p>
-                    {skill.projects.map((project, idx) => (
-                      <p key={idx} className="text-xs text-terminal-green">• {project}</p>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
-          ))}
+              <div style={{ color: '#00ff41', fontWeight: 700, fontSize: 20, marginBottom: 8 }}>{skills.find(s => s.id === hoveredSkill)?.name}</div>
+              <div style={{ fontSize: 16, color: '#bdbdbd', whiteSpace: 'pre-line' }}>{skills.find(s => s.id === hoveredSkill)?.description}</div>
+            </div>
+          )}
         </div>
 
         {/* Legend */}
