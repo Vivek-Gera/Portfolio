@@ -1,51 +1,79 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import DataUniverse from './DataUniverse';
 
+const terminalLines = [
+  "// Welcome to Vivek Gera's Data Engine",
+  "booting pipelines...",
+  "initializing JVM...",
+  "loading microservices...",
+  "connecting to Kafka cluster...",
+  "spark context ready...",
+  "airflow DAGs loaded...",
+  "system ready for data processing",
+  "",
+  "> Hello, I'm Vivek Gera",
+  "> Data Engineer & Java Developer",
+  "> Building scalable data platforms",
+  "> Creating robust backend systems",
+  "",
+  "> Ready to transform your data infrastructure"
+];
+
 const HeroSection: React.FC = () => {
   const [currentLine, setCurrentLine] = useState(0);
   const [displayedText, setDisplayedText] = useState('');
-  
-  const terminalLines = [
-    "// Welcome to Vivek Gera's Data Engine",
-    "booting pipelines...",
-    "initializing JVM...",
-    "loading microservices...",
-    "connecting to Kafka cluster...",
-    "spark context ready...",
-    "airflow DAGs loaded...",
-    "system ready for data processing",
-    "",
-    "> Hello, I'm Vivek Gera",
-    "> Data Engineer & Java Developer",
-    "> Building scalable data platforms",
-    "> Creating robust backend systems",
-    "",
-    "> Ready to transform your data infrastructure"
-  ];
+  const [isTyping, setIsTyping] = useState(true);
+  const typingTimeout = useRef<NodeJS.Timeout | null>(null);
+  const lineTimeout = useRef<NodeJS.Timeout | null>(null);
+  const terminalRef = useRef<HTMLDivElement | null>(null);
+
+  // Typing effect
+  const typeLine = useCallback((line: string, charIndex: number) => {
+    if (charIndex <= line.length) {
+      setDisplayedText(line.substring(0, charIndex));
+      typingTimeout.current = setTimeout(() => typeLine(line, charIndex + 1), 120);
+    } else {
+      setIsTyping(false);
+      lineTimeout.current = setTimeout(() => {
+        setCurrentLine(prev => prev + 1);
+        setIsTyping(true);
+      }, 800);
+    }
+  }, []);
 
   useEffect(() => {
+    setDisplayedText('');
     if (currentLine < terminalLines.length) {
-      const line = terminalLines[currentLine];
-      let charIndex = 0;
-      
-      const interval = setInterval(() => {
-        if (charIndex <= line.length) {
-          setDisplayedText(line.substring(0, charIndex));
-          charIndex++;
-        } else {
-          clearInterval(interval);
-          setTimeout(() => {
-            setCurrentLine(prev => prev + 1);
-          }, 500);
-        }
-      }, 50);
-
-      return () => clearInterval(interval);
+      typeLine(terminalLines[currentLine], 0);
     }
-  }, [currentLine, terminalLines]);
+    return () => {
+      if (typingTimeout.current) clearTimeout(typingTimeout.current);
+      if (lineTimeout.current) clearTimeout(lineTimeout.current);
+    };
+  }, [currentLine, typeLine]);
+
+  // Restart animation on tab focus
+  useEffect(() => {
+    function handleVisibility() {
+      if (document.visibilityState === 'visible') {
+        setCurrentLine(0);
+        setDisplayedText('');
+        setIsTyping(true);
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
+  // Auto-scroll terminal to bottom on new line or character
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [currentLine, displayedText]);
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -76,34 +104,27 @@ const HeroSection: React.FC = () => {
               </div>
               <span className="ml-4 text-terminal-green text-sm">vivek@dataverse:~</span>
             </div>
-            
-            <div className="font-mono text-terminal-green text-left">
-              {terminalLines.slice(0, currentLine).map((line, index) => (
-                <div key={index} className="mb-1">
-                  {line}
-                </div>
-              ))}
-              {currentLine < terminalLines.length && (
-                <div className="mb-1">
-                  {displayedText}
-                  <span className="cursor-blink"></span>
-                </div>
-              )}
+            <div ref={terminalRef} className="font-mono text-terminal-green text-left h-24 overflow-y-auto custom-scrollbar">
+              {/* Terminal content below */}
+              <div>
+                {terminalLines.slice(0, currentLine).map((line, index) => (
+                  <div key={index} className="mb-1">{line}</div>
+                ))}
+                {currentLine < terminalLines.length && (
+                  <div style={{ display: 'inline' }}>
+                    {displayedText}<span className="cursor-blink"></span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Main Title */}
-          <motion.h1
-            className="text-5xl md:text-7xl font-bold mb-6 gradient-text"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 2, duration: 0.8 }}
-          >
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-terminal-green">
             Vivek Gera
-          </motion.h1>
-          
+          </h1>
           <motion.p
-            className="text-2xl md:text-3xl text-gray-300 mb-8"
+            className="text-2xl md:text-3xl text-terminal-green mb-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 2.5, duration: 0.8 }}
@@ -126,7 +147,6 @@ const HeroSection: React.FC = () => {
             >
               View Projects
             </motion.button>
-            
             <motion.button
               className="border border-terminal-green text-terminal-green px-8 py-3 rounded-lg font-bold hover:bg-terminal-green hover:text-terminal-dark transition-colors duration-200"
               whileHover={{ scale: 1.05 }}

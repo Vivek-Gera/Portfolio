@@ -3,6 +3,7 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -16,7 +17,11 @@ module.exports = {
         'error-red': '#ff3333',
         'dark-bg': '#0d1117',
         'card-bg': '#161b22',
-        'border-gray': '#30363d'
+        'border-gray': '#30363d',
+        'bp-purple': '#4B006E',
+        'light-bg': '#ffffff',
+        'light-text': '#222222',
+        'white': '#ffffff',
       },
       fontFamily: {
         'mono': ['Courier New', 'monospace'],

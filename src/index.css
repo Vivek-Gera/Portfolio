@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-dark-bg text-white font-code;
+    @apply bg-dark-bg text-white font-code dark:bg-dark-bg dark:text-white bg-light-bg text-light-text;
     overflow-x: hidden;
   }
   
@@ -15,11 +15,11 @@
 
 @layer components {
   .terminal-text {
-    @apply text-terminal-green font-mono;
+    @apply font-mono text-terminal-green;
   }
   
   .code-block {
-    @apply bg-card-bg border border-border-gray rounded-lg p-4 font-mono text-sm;
+    @apply bg-card-bg border border-border-gray rounded-lg p-4 font-mono text-sm dark:bg-card-bg bg-white;
   }
   
   .gradient-text {
@@ -60,6 +60,7 @@
 .cursor-blink::after {
   content: '|';
   animation: blink 2s infinite;
+  color: #00ff41;
 }
 
 /* Data flow animation */

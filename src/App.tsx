@@ -11,7 +11,7 @@ import Navigation from './components/Navigation';
 
 const App: React.FC = () => {
   return (
-    <div className="min-h-screen bg-dark-bg">
+    <div className="min-h-screen bg-dark-bg text-white">
       <Navigation />
       
       <motion.div

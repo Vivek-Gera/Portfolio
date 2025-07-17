@@ -11,8 +11,7 @@ const Navigation: React.FC = () => {
     { name: 'Experience', href: '#experience' },
     { name: 'Blog', href: '#blog' },
     { name: 'Videos', href: '#videos' },
-    { name: 'Contact', href: '#contact' },
-    { name: 'Admin', href: '/admin' }
+    { name: 'Contact', href: '#contact' }
   ];
 
   const scrollToSection = (href: string) => {
@@ -25,7 +24,7 @@ const Navigation: React.FC = () => {
 
   return (
     <motion.nav 
-      className="fixed top-0 w-full z-50 bg-dark-bg/90 backdrop-blur-sm border-b border-border-gray"
+      className="fixed top-0 w-full z-50 bg-dark-bg backdrop-blur-sm border-b border-terminal-green text-terminal-green"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
@@ -38,7 +37,7 @@ const Navigation: React.FC = () => {
             whileHover={{ scale: 1.05 }}
           >
             <div className="w-8 h-8 data-node"></div>
-            <span className="terminal-text font-bold text-lg">Vivek.dev</span>
+            <span className="terminal-text font-bold text-lg text-terminal-green">Vivek.dev</span>
           </motion.div>
 
           {/* Desktop Navigation */}
@@ -46,7 +45,7 @@ const Navigation: React.FC = () => {
             {navItems.map((item, index) => (
               <motion.button
                 key={item.name}
-                className="terminal-text hover:text-white transition-colors duration-200"
+                className="terminal-text text-terminal-green hover:text-terminal-green transition-colors duration-200"
                 onClick={() => scrollToSection(item.href)}
                 whileHover={{ scale: 1.05 }}
                 initial={{ opacity: 0, y: -20 }}
@@ -74,16 +73,16 @@ const Navigation: React.FC = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <motion.div 
-            className="md:hidden"
+            className="md:hidden bg-white dark:bg-card-bg border-t border-bp-purple dark:border-terminal-green"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
           >
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-card-bg border-t border-border-gray">
+            <div className="px-2 pt-2 pb-3 space-y-1">
               {navItems.map((item) => (
                 <button
                   key={item.name}
-                  className="block w-full text-left terminal-text hover:text-white px-3 py-2 rounded-md transition-colors duration-200"
+                  className="block w-full text-left terminal-text hover:text-bp-purple dark:hover:text-terminal-green px-3 py-2 rounded-md transition-colors duration-200"
                   onClick={() => scrollToSection(item.href)}
                 >
                   {item.name}
