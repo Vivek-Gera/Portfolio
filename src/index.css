@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-dark-bg text-white font-code;
+    overflow-x: hidden;
+  }
+  
+  * {
+    @apply border-border-gray;
+  }
+}
+
+@layer components {
+  .terminal-text {
+    @apply text-terminal-green font-mono;
+  }
+  
+  .code-block {
+    @apply bg-card-bg border border-border-gray rounded-lg p-4 font-mono text-sm;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-terminal-green via-data-blue to-api-purple bg-clip-text text-transparent;
+  }
+  
+  .glow-effect {
+    @apply shadow-lg shadow-terminal-green/20;
+  }
+  
+  .data-node {
+    @apply bg-gradient-to-br from-data-blue to-api-purple rounded-full;
+  }
+  
+  .pipeline-connection {
+    @apply bg-gradient-to-r from-pipeline-orange to-terminal-green;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-dark-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-terminal-green rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-terminal-green/80;
+}
+
+/* Terminal cursor animation */
+.cursor-blink::after {
+  content: '|';
+  animation: blink 2s infinite;
+}
+
+/* Data flow animation */
+@keyframes dataFlow {
+  0% { transform: translateX(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+.data-flow {
+  animation: dataFlow 3s linear infinite;
+} 
