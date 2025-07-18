@@ -71,7 +71,7 @@ const getSkillColor = (category: string) => {
   return colors[category as keyof typeof colors] || 'from-gray-500 to-gray-600';
 };
 
-const NODE_RADIUS = 55; // Increased radius for larger circles
+const NODE_RADIUS = 60; // Increased radius for larger circles
 
 const SkillsMap: React.FC = () => {
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
@@ -96,7 +96,7 @@ const SkillsMap: React.FC = () => {
         </motion.div>
 
         {/* Circuit Board Container */}
-        <div className="relative w-full h-[600px] bg-card-bg border border-border-gray rounded-lg overflow-hidden">
+        <div className="relative w-full h-[800px] bg-card-bg border border-border-gray rounded-lg overflow-hidden">
           {/* Grid Pattern */}
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <svg width="100%" height="100%">
@@ -111,7 +111,7 @@ const SkillsMap: React.FC = () => {
 
           {/* SVG for lines and nodes */}
           <svg className="absolute inset-0 w-full h-full" width="100%" height="100%"
-            viewBox="0 0 1200 720" // Increased viewBox for larger layout
+            viewBox="0 -170 1200 880" // Increased height by 4 grid blocks (160 units)
             style={{ display: 'block', zIndex: 10 }}
           >
             {/* Connections */}
