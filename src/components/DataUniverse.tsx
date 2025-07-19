@@ -1,10 +1,11 @@
-import React, { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import React, { useRef, useEffect } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const DataUniverse: React.FC = () => {
   const groupRef = useRef<THREE.Group>(null);
   const nodesRef = useRef<THREE.Mesh[]>([]);
+  const { gl } = useThree();
 
   // Create simple animated data nodes
   const createNodes = () => {
@@ -27,12 +28,37 @@ const DataUniverse: React.FC = () => {
     return nodes;
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (groupRef.current) {
       const nodes = createNodes();
       nodes.forEach(node => groupRef.current!.add(node));
       nodesRef.current = nodes;
     }
+    // WebGL context loss handler
+    const handleContextLost = (event: Event) => {
+      event.preventDefault();
+      // Optionally show a message or try to recover
+      // eslint-disable-next-line no-console
+      console.warn('WebGL context lost in DataUniverse');
+    };
+    gl.domElement.addEventListener('webglcontextlost', handleContextLost, false);
+    return () => {
+      // Clean up nodes
+      nodesRef.current.forEach(node => {
+        if (node.geometry) node.geometry.dispose();
+        if (node.material) {
+          if (Array.isArray(node.material)) {
+            node.material.forEach(mat => mat.dispose());
+          } else {
+            node.material.dispose();
+          }
+        }
+        if (groupRef.current) groupRef.current.remove(node);
+      });
+      // Remove event listener
+      gl.domElement.removeEventListener('webglcontextlost', handleContextLost);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useFrame((state) => {
@@ -53,7 +79,6 @@ const DataUniverse: React.FC = () => {
     <group ref={groupRef}>
       {/* Ambient light */}
       <ambientLight intensity={0.1} />
-      
       {/* Point lights */}
       <pointLight position={[5, 5, 5]} intensity={0.3} color={0x00ff41} />
       <pointLight position={[-5, -5, -5]} intensity={0.2} color={0x0066cc} />
