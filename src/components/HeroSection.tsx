@@ -22,6 +22,18 @@ const terminalLines = [
   "> Ready to transform your data infrastructure"
 ];
 
+// Utility function to check WebGL support
+function isWebGLAvailable() {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!window.WebGLRenderingContext && (
+      !!canvas.getContext('webgl') || !!canvas.getContext('experimental-webgl')
+    );
+  } catch (e) {
+    return false;
+  }
+}
+
 const HeroSection: React.FC = () => {
   const [currentLine, setCurrentLine] = useState(0);
   const [displayedText, setDisplayedText] = useState('');
@@ -29,6 +41,11 @@ const HeroSection: React.FC = () => {
   const typingTimeout = useRef<NodeJS.Timeout | null>(null);
   const lineTimeout = useRef<NodeJS.Timeout | null>(null);
   const terminalRef = useRef<HTMLDivElement | null>(null);
+  const [webglSupported, setWebglSupported] = useState(true);
+
+  useEffect(() => {
+    setWebglSupported(isWebGLAvailable());
+  }, []);
 
   // Typing effect
   const typeLine = useCallback((line: string, charIndex: number) => {
@@ -79,11 +96,17 @@ const HeroSection: React.FC = () => {
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Three.js Background */}
       <div className="absolute inset-0 z-0">
-        <Canvas camera={{ position: [0, 0, 5] }}>
-          <OrbitControls enableZoom={false} enablePan={false} />
-          <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
-          <DataUniverse />
-        </Canvas>
+        {webglSupported ? (
+          <Canvas camera={{ position: [0, 0, 5] }}>
+            <OrbitControls enableZoom={false} enablePan={false} />
+            <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+            <DataUniverse />
+          </Canvas>
+        ) : (
+          <div className="flex items-center justify-center h-full text-red-500 font-mono bg-black bg-opacity-80">
+            WebGL is not supported on this device/browser.
+          </div>
+        )}
       </div>
 
       {/* Content */}
